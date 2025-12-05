@@ -1,0 +1,232 @@
+// Configura tus fuentes de contenido aquí.
+// Puedes conectar un endpoint externo o usar plantillas locales.
+
+const el = (id) => document.getElementById(id);
+const today = new Date();
+const todayKey = today.toISOString().slice(0,10);
+el('today').textContent = today.toLocaleDateString('es-MX', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
+
+const weekdayNames = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
+el('dayName').textContent = weekdayNames[today.getDay()];
+
+// Plan temático semanal local (puedes remplazar por tu generador)
+const weeklyThemes = ['Fe Activa','Perdón','Paciencia','Esperanza'];
+const currentWeekIndex = Math.floor(daysSince('2025-01-06')/7) % weeklyThemes.length;
+const currentTheme = weeklyThemes[currentWeekIndex];
+el('weekTheme').textContent = currentTheme;
+
+function daysSince(startDateStr) {
+  const start = new Date(startDateStr);
+  return Math.floor((today - start) / (1000*60*60*24));
+}
+
+// Contenido base por día y tema (ejemplo breve)
+const contentLibrary = {
+  'Fe Activa': {
+    verse: 'Santiago 1:22 (RVR60)',
+    deepening: [
+      'Palabra: poiētēs → productor, ejecutor.',
+      'Contraste: oidor vs. hacedor.',
+      'Evidencia: obediencia que transforma.'
+    ],
+    meditation: 'La fe auténtica se verifica en la obediencia diaria: lo que creemos se vuelve lo que hacemos.',
+    key: 'Preguntar “¿Es bíblico?” antes que “¿Es conveniente?”.',
+    challenges: {
+      hogar: 'Práctica en hogar: servir a tu familia en algo que has postergado y hacerlo hoy con amor.',
+      trabajo: 'Práctica en trabajo/estudio: cumplir una tarea difícil sin quejarte, como servicio al Señor.',
+      iglesia: 'Práctica en iglesia: animar a un hermano con un mensaje y orar por él inmediatamente.'
+    },
+    rhema: 'La fe que obra revela que Cristo vive en nosotros.'
+  },
+  'Perdón': {
+    verse: 'Efesios 4:32 (RVR60)',
+    deepening: [
+      'Gracia: perdonar como fuimos perdonados.',
+      'Renuncia: soltar ofensa y venganza.',
+      'Práctica: reconciliación intencional.'
+    ],
+    meditation: 'El perdón rompe cadenas y abre espacio para el amor; es mandato y medicina.',
+    key: 'El perdón no minimiza el dolor; lo entrega a Cristo.',
+    challenges: {
+      hogar: 'Acércate con humildad y pide perdón por una palabra dura.',
+      trabajo: 'Elige no devolver mal por mal; responde con respeto.',
+      iglesia: 'Ora por quien te ha herido y busca un paso de reconciliación.'
+    },
+    rhema: 'El perdón recibido se convierte en perdón ofrecido.'
+  },
+  'Paciencia': {
+    verse: 'Santiago 5:7 (RVR60)',
+    deepening: [
+      'Esperar: como el labrador la lluvia.',
+      'Fortaleza: corazón afirmado.',
+      'Confianza: tiempos de Dios.'
+    ],
+    meditation: 'La paciencia guarda el alma en paz mientras Dios obra detrás del telón.',
+    key: 'La prisa rara vez produce fruto eterno.',
+    challenges: {
+      hogar: 'Escucha sin interrumpir y responde con mansedumbre.',
+      trabajo: 'Acepta un proceso lento y mantén excelencia.',
+      iglesia: 'Sirve sin buscar reconocimiento inmediato.'
+    },
+    rhema: 'La paciencia es fe en el tiempo de Dios.'
+  },
+  'Esperanza': {
+    verse: 'Romanos 15:13 (RVR60)',
+    deepening: [
+      'Fuente: Dios de esperanza.',
+      'Medio: fe que llena de gozo y paz.',
+      'Fruto: abundancia por el Espíritu.'
+    ],
+    meditation: 'La esperanza bíblica ancla el corazón en las promesas, no en las circunstancias.',
+    key: 'La esperanza mira al Consumador, no al pronóstico.',
+    challenges: {
+      hogar: 'Declara una promesa sobre tu casa y ora en voz alta.',
+      trabajo: 'Renueva tu ánimo con un salmo antes de iniciar.',
+      iglesia: 'Comparte un testimonio de la fidelidad de Dios.'
+    },
+    rhema: 'La esperanza sostiene mientras llega el cumplimiento.'
+  }
+};
+
+// Cargar contenido del día (puedes reemplazar por fetch a tu generador)
+const theme = currentTheme;
+const c = contentLibrary[theme];
+el('verseText').textContent = `“${c.verse}”`;
+renderList('deepeningList', c.deepening);
+el('meditation').textContent = c.meditation;
+el('keyInsight').textContent = `Clave: ${c.key}`;
+
+const contextSelect = el('contextSelect');
+const challengeText = el('challengeText');
+function updateChallenge() {
+  const ctx = contextSelect.value;
+  challengeText.textContent = c.challenges[ctx];
+}
+contextSelect.addEventListener('change', updateChallenge);
+updateChallenge();
+
+// Compartir por WhatsApp
+el('shareBtn').addEventListener('click', () => {
+  const msg = `Camino Vivo — ${theme}\nVersículo: ${c.verse}\nReto (${contextSelect.value}): ${challengeText.textContent}\nRhema: ${c.rhema}`;
+  const url = `https://wa.me/?text=${encodeURIComponent(msg)}`;
+  window.open(url, '_blank');
+});
+
+// Progreso semanal (localStorage simplificado; luego puedes migrar a Firestore)
+const streakKey = `streak_${weekYearKey()}`;
+function weekYearKey(date = today) {
+  const y = date.getFullYear();
+  const oneJan = new Date(y,0,1);
+  const week = Math.floor(((date - oneJan) / 86400000 + oneJan.getDay()+1) / 7);
+  return `${y}_w${week}`;
+}
+function getStreak() {
+  const raw = localStorage.getItem(streakKey);
+  return raw ? JSON.parse(raw) : { days: [] };
+}
+function setStreak(s) { localStorage.setItem(streakKey, JSON.stringify(s)); }
+function refreshStreak() {
+  const s = getStreak();
+  el('streak').textContent = `Progreso esta semana: ${s.days.length}/7 retos cumplidos`;
+}
+refreshStreak();
+
+el('markDone').addEventListener('click', () => {
+  const s = getStreak();
+  if (!s.days.includes(todayKey)) {
+    s.days.push(todayKey);
+    setStreak(s);
+    refreshStreak();
+  }
+});
+
+// Diario privado (localStorage; opción de migrar a Firestore)
+const journalKey = `journal_${todayKey}`;
+function loadJournal() {
+  const raw = localStorage.getItem(journalKey);
+  if (!raw) return;
+  const j = JSON.parse(raw);
+  el('q1').value = j.q1 || '';
+  el('q2').value = j.q2 || '';
+  el('prayer').value = j.prayer || '';
+}
+loadJournal();
+
+el('journalForm').addEventListener('submit', (e) => {
+  e.preventDefault();
+  const data = {
+    q1: el('q1').value.trim(),
+    q2: el('q2').value.trim(),
+    prayer: el('prayer').value.trim(),
+    savedAt: Date.now(),
+    theme
+  };
+  localStorage.setItem(journalKey, JSON.stringify(data));
+  const notice = el('journalSaved');
+  notice.classList.remove('hidden');
+  setTimeout(() => notice.classList.add('hidden'), 2200);
+});
+
+// Comentarios comunitarios (demo local; reemplazar por Firestore)
+const commentsEl = el('comments');
+const commentForm = el('commentForm');
+const commentsKey = `comments_${todayKey}`;
+function loadComments() {
+  commentsEl.innerHTML = '';
+  const raw = localStorage.getItem(commentsKey);
+  const items = raw ? JSON.parse(raw) : [];
+  items.reverse().forEach(c => {
+    const wrap = document.createElement('div');
+    wrap.className = 'comment';
+    wrap.innerHTML = `<div class="nick">${escapeHTML(c.nickname)}</div><div class="text">${escapeHTML(c.comment)}</div>`;
+    commentsEl.appendChild(wrap);
+  });
+}
+function saveComment(nickname, comment) {
+  const raw = localStorage.getItem(commentsKey);
+  const items = raw ? JSON.parse(raw) : [];
+  items.push({ nickname, comment, createdAt: Date.now() });
+  localStorage.setItem(commentsKey, JSON.stringify(items));
+}
+commentForm.addEventListener('submit', (e) => {
+  e.preventDefault();
+  const nickname = document.getElementById('nickname').value.trim();
+  const comment = document.getElementById('comment').value.trim();
+  if (!nickname || !comment) return;
+  saveComment(nickname, comment);
+  document.getElementById('comment').value = '';
+  loadComments();
+});
+loadComments();
+
+// Historial (últimos 5 días guardados localmente)
+const historyEl = el('history');
+function renderHistory() {
+  historyEl.innerHTML = '';
+  for (let i = 0; i < 5; i++) {
+    const d = new Date(today); d.setDate(today.getDate() - i);
+    const key = d.toISOString().slice(0,10);
+    const jKey = `journal_${key}`;
+    const jRaw = localStorage.getItem(jKey);
+    const rhema = c.rhema; // placeholder por tema actual
+    const item = document.createElement('div');
+    item.className = 'history-item';
+    item.innerHTML = `<div class="date">${key}</div><div class="rhema">${rhema}</div>`;
+    historyEl.appendChild(item);
+  }
+}
+renderHistory();
+
+// Utilidades
+function renderList(id, items) {
+  const ul = el(id);
+  ul.innerHTML = '';
+  items.forEach(t => {
+    const li = document.createElement('li');
+    li.textContent = t;
+    ul.appendChild(li);
+  });
+}
+function escapeHTML(str) {
+  return str.replace(/[&<>"']/g, (m) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+}

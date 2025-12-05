@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Camino Vivo — Devocional Diario</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css"/>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">Camino Vivo</div>
+    <div class="date" id="today"></div>
+  </header>
+
+  <main class="container">
+    <section class="card">
+      <h2>Lectura bíblica</h2>
+      <div id="verseBox">
+        <p id="verseText">“Pero sed hacedores de la palabra…” — Santiago 1:22 (RVR60)</p>
+        <div class="subtle">Semana: <span id="weekTheme">Fe Activa</span> • Día: <span id="dayName">Viernes</span></div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>Profundización</h2>
+      <ul class="bullets" id="deepeningList"></ul>
+    </section>
+
+    <section class="card">
+      <h2>Meditación</h2>
+      <p id="meditation"></p>
+      <blockquote class="tip" id="keyInsight"></blockquote>
+    </section>
+
+    <section class="card">
+      <h2>Reto personal</h2>
+      <div class="form inline">
+        <label>Elige tu contexto de aplicación</label>
+        <select id="contextSelect">
+          <option value="hogar">Hogar</option>
+          <option value="trabajo">Trabajo/estudio</option>
+          <option value="iglesia">Iglesia/servicio</option>
+        </select>
+      </div>
+      <p id="challengeText"></p>
+      <button id="markDone" class="primary">Marcar reto como cumplido</button>
+      <div id="streak" class="subtle"></div>
+      <button id="shareBtn" class="ghost">Compartir por WhatsApp</button>
+    </section>
+
+    <section class="card">
+      <h2>Oración breve</h2>
+      <audio id="prayerAudio" controls preload="none">
+        <source src="https://cdn.pixabay.com/download/audio/2022/03/24/audio_7c9fb5.mp3?filename=calm-ambient-100bpm-20365.mp3" type="audio/mpeg">
+        Tu navegador no soporta audio.
+      </audio>
+      <div class="tiny subtle">Audio ilustrativo. Reemplázalo por tu oración breve.</div>
+    </section>
+
+    <section class="card">
+      <h2>Diario de reflexión (privado)</h2>
+      <form id="journalForm" class="form">
+        <label>1) ¿Dónde estoy siendo solo oidor?</label>
+        <textarea id="q1" placeholder="Tu respuesta..."></textarea>
+        <label>2) ¿Qué obediencia concreta haré hoy?</label>
+        <textarea id="q2" placeholder="Tu respuesta..."></textarea>
+        <label>Oración libre</label>
+        <textarea id="prayer" placeholder="Escribe tu oración..."></textarea>
+        <button class="primary" type="submit">Guardar</button>
+        <div id="journalSaved" class="success hidden">Guardado ✅</div>
+      </form>
+    </section>
+
+    <section class="card">
+      <h2>Reflexión en comunidad</h2>
+      <form id="commentForm" class="form">
+        <input id="nickname" type="text" placeholder="Tu nombre o apodo (obligatorio)"/>
+        <input id="comment" type="text" maxlength="250" placeholder="Comparte una reflexión corta..."/>
+        <button class="primary" type="submit">Enviar</button>
+      </form>
+      <div id="comments" class="comments"></div>
+    </section>
+
+    <section class="card">
+      <h2>Revisión semanal</h2>
+      <div id="weeklyReview" class="review"></div>
+    </section>
+
+    <section class="card">
+      <h2>Historial</h2>
+      <div id="history" class="history"></div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div>“Puestos los ojos en Jesús, el autor y consumador de la fe.” — Hebreos 12:2</div>
+    <div class="tiny">Camino Vivo • Discipulado digital con propósito</div>
+  </footer>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>
